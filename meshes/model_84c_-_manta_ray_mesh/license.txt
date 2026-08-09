@@ -1,0 +1,11 @@
+Model Information:
+* title:	Model 84C - Manta Ray Mesh
+* source:	https://sketchfab.com/3d-models/model-84c-manta-ray-mesh-38fa168e96944e518fe15e702ad79ee0
+* author:	DigitalLife3D (https://sketchfab.com/DigitalLife3D)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Model 84C - Manta Ray Mesh" (https://sketchfab.com/3d-models/model-84c-manta-ray-mesh-38fa168e96944e518fe15e702ad79ee0) by DigitalLife3D (https://sketchfab.com/DigitalLife3D) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

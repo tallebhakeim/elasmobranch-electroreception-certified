@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+figures/*.png
+*.docx
+*.log
+sensitivity_results.json
+
+# The two surface models ARE committed: CC BY-NC 4.0 permits non-commercial redistribution
+# with attribution, the supplementary information states that they are redistributed, and a
+# reviewer who has to hunt for them separately cannot reproduce Figures 1, 5 and 6.
