@@ -311,8 +311,8 @@ def build():
              ["lorenzini_poc.py", "canal funnelling and the directional sweep, Figure 2"],
              ["lorenzini_freq.py", "the band-pass and its corners, Figure 4"],
              ["lorenzini_3d.py", "the directional rosette, Figure 3"],
-             ["lorenzini_mesh3d_fig.py", "the mesh figure, Figure 1"],
-             ["lorenzini_real.py", "receptor levels on both body plans, Figures 5 and 6"],
+             ["lorenzini_real.py", "the mesh figure and the receptor levels on both body "
+                                  "plans, Figures 1, 5 and 6"],
              ["lorenzini_cloak.py, lorenzini_cloak_fig.py", "electrical visibility, Figure 7"],
              ["sensitivity_lorenzini.py", "the campaign of Section S5 (JSON output)"],
              ["make_sensitivity_figures.py", "Figures S1 to S4"],
