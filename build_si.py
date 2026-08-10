@@ -31,7 +31,9 @@ OUT = os.path.join(HERE, "Supplementary_Information_JTB_v2.docx")
 REPO = "https://github.com/tallebhakeim/elasmobranch-electroreception-certified"
 # Set once the archived release exists; the DOI line is omitted entirely while it is empty,
 # so the document never ships a placeholder.
-ZENODO_DOI = ""
+# Concept DOI: it is version-independent and always resolves to the latest release,
+# which is what a reader should cite. v1.0.1 itself is 10.5281/zenodo.21870127.
+ZENODO_DOI = "https://doi.org/10.5281/zenodo.21869983"
 
 
 
@@ -305,7 +307,8 @@ def build():
         "the tables above is transcribed by hand.")
     s.p(f"Repository: {REPO}")
     if ZENODO_DOI:
-        s.p(f"Archived release: {ZENODO_DOI}")
+        s.p(f"Archived release, with a DOI that resolves to the latest version: "
+            f"{ZENODO_DOI}")
     s.table(["script", "produces"],
             [["lorenzini_certified.py", "the guaranteed brackets on the access conductance"],
              ["lorenzini_poc.py", "canal funnelling and the directional sweep, Figure 2"],
