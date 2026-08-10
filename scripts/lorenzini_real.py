@@ -216,44 +216,97 @@ def fig_compare(R):  # Figure 6: real hammerhead vs real manta
     print("-> Fig_ray_vs_shark.png (hammerhead vs manta)")
 
 
-def fig_mesh(d):  # Figure 2: the real tetrahedral mesh on the hammerhead
+def _hull2d(pts):
+    """Order 2 to 4 planar points into a simple polygon, by angle about their centroid."""
+    c = pts.mean(0)
+    return pts[np.argsort(np.arctan2(pts[:, 1]-c[1], pts[:, 0]-c[0]))]
+
+
+def fig_mesh(d):  # Figure 1: the real tetrahedral mesh on the hammerhead
     import matplotlib.pyplot as plt
+    from matplotlib.collections import PolyCollection
+    from matplotlib.patches import Patch
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
     surf, m, sig, amp = d["surf"], d["m"], d["sig"], d["amp"]
     P, T = m.points, m.tets; cen = P[T].mean(1)
-    fig = plt.figure(figsize=(14, 6.2))
-    ax = fig.add_subplot(1, 2, 1, projection="3d")
-    ax.add_collection3d(Poly3DCollection(surf.vertices[surf.faces], alpha=0.16, facecolor="#9aa7b0", edgecolor="none"))
-    for _, pore, recv in amp:
-        ax.plot(*np.c_[pore, recv], color="#A32D2D", lw=2.2); ax.scatter(*pore, s=30, c="#A32D2D", depthshade=False)
     b = surf.bounds
+
+    fig = plt.figure(figsize=(13.6, 5.3))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.0, 1.12], wspace=0.02,
+                          left=0.01, right=0.99, bottom=0.10, top=0.86)
+
+    # --- (a) the animal in seawater, with the ventral array -------------------------
+    ax = fig.add_subplot(gs[0], projection="3d")
+    ax.add_collection3d(Poly3DCollection(surf.vertices[surf.faces], alpha=0.16,
+                                         facecolor="#9aa7b0", edgecolor="none"))
+    for _, pore, recv in amp:
+        ax.plot(*np.c_[pore, recv], color="#A32D2D", lw=2.2)
+        ax.scatter(*pore, s=30, c="#A32D2D", depthshade=False)
     for i, s in enumerate("xyz"):
         getattr(ax, f"set_{s}lim")(b[0, i], b[1, i])
-    try: ax.set_box_aspect(b[1]-b[0])
+    # The body is long and thin, so the default framing spends most of the panel on empty
+    # space. zoom pushes the box out to the panel edges; without it (a) reads as a margin.
+    try: ax.set_box_aspect(b[1]-b[0], zoom=1.22)
+    except TypeError: ax.set_box_aspect(b[1]-b[0])
     except Exception: pass
     ax.view_init(elev=70, azim=-90); ax.set_axis_off()
-    ax.set_title("(a) Great hammerhead immersed in seawater\nventral ampulla array on the cephalofoil", fontsize=10)
-    ax2 = fig.add_subplot(1, 2, 2, projection="3d")
+    ax.set_title("(a) Great hammerhead immersed in seawater,\nventral ampulla array on the cephalofoil",
+                 fontsize=10)
+
+    # --- (b) a horizontal slab of the mesh, drawn flat -------------------------------
+    # The slab is a plane cut, so it is drawn in a 2D axes: a top-down 3D view of a flat
+    # object wastes the panel and cannot be given an equal aspect ratio.
     canal = np.zeros(m.nt, bool)
     for _, pore, recv in amp:
         dd = recv-pore; L2 = float(dd@dd); t = np.clip(((cen-pore)@dd)/L2, 0, 1)
         canal |= np.linalg.norm(cen-(pore+t[:, None]*dd), axis=1) < R_CAN
     mat = np.full(m.nt, 0); mat[np.isclose(sig, SIG_TIS)] = 1; mat[canal] = 2
     fc = {0: "#cfe0ea", 1: "#c2a878", 2: "#d6452f"}
-    zc = np.median(cen[:, 2]); slab = np.abs(cen[:, 2]-zc) < 0.02*L_TARGET
-    F = np.array([[0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]]); polys, cols = [], []
-    for ti in np.where(slab)[0]:
-        for f in F: polys.append(P[T[ti]][f]); cols.append(fc[mat[ti]])
-    ax2.add_collection3d(Poly3DCollection(polys, facecolor=cols, edgecolor="0.35", linewidths=0.2, alpha=0.92))
-    for i in range(2):
-        getattr(ax2, f"set_{'xyz'[i]}lim")(b[0, i], b[1, i])
-    ax2.set_zlim(zc-0.1, zc+0.1); ax2.view_init(elev=88, azim=-90); ax2.set_axis_off()
-    from matplotlib.patches import Patch
-    ax2.legend(handles=[Patch(facecolor=fc[1], label="tissue (0.3 S/m)"), Patch(facecolor=fc[0], label="seawater (4 S/m)"),
-                        Patch(facecolor=fc[2], label="gel canal (4 S/m)")], fontsize=8, loc="lower center", ncol=3, bbox_to_anchor=(0.5, -0.02))
-    ax2.set_title("(b) The real tetrahedral DGM mesh (horizontal slab)\nresolving tissue, seawater and the gel canals", fontsize=10)
-    fig.suptitle("Three-dimensional tetrahedral discretisation on a real great hammerhead head", fontsize=12)
-    fig.tight_layout(rect=[0, 0, 1, 0.95]); fig.savefig(os.path.join(FIGDIR, "Fig_mesh3d.png"), dpi=130); plt.close(fig)
+    zc = np.median(cen[:, 2]); slab = np.where(np.abs(cen[:, 2]-zc) < 0.02*L_TARGET)[0]
+    polys = [_hull2d(P[T[ti]][:, :2]) for ti in slab]
+    cols = [fc[mat[ti]] for ti in slab]
+
+    ax2 = fig.add_subplot(gs[1])
+    ax2.add_collection(PolyCollection(polys, facecolors=cols, edgecolors="0.45",
+                                      linewidths=0.25))
+    # Frame on the mesh itself, not on the whole animal: the conduction mesh covers the head
+    # box only, and framing on the body bounds is what squashed this panel.
+    sp = np.concatenate(polys)
+    ax2.set_xlim(sp[:, 0].min(), sp[:, 0].max())
+    ax2.set_ylim(sp[:, 1].min(), sp[:, 1].max())
+    ax2.set_aspect("equal"); ax2.set_axis_off()
+    ax2.set_title("(b) The real tetrahedral DGM mesh, horizontal slab,\n"
+                  "resolving tissue, seawater and the gel canals", fontsize=10)
+
+    # Inset: one canal at its own scale. The claim in the text is that the canals are
+    # resolved, and at the scale of (b) nine millimetric canals read as a single band.
+    _, pore, recv = amp[len(amp)//2]
+    cx, cy = 0.5*(pore[0]+recv[0]), 0.5*(pore[1]+recv[1])
+    w = 4.5*R_CAN
+    axi = ax2.inset_axes([0.615, 0.60, 0.375, 0.375],
+                         xlim=(cx-w, cx+w), ylim=(cy-w, cy+w),
+                         xticks=[], yticks=[])
+    axi.add_collection(PolyCollection(polys, facecolors=cols, edgecolors="0.45",
+                                      linewidths=0.45))
+    axi.set_aspect("equal")
+    for s in axi.spines.values():
+        s.set(edgecolor="0.35", linewidth=0.8)
+    ax2.indicate_inset_zoom(axi, edgecolor="0.35", linewidth=0.8, alpha=0.9)
+    # No anatomical dimension is quoted here on purpose: on these body-scale meshes the
+    # canal radius is set equal to the element size, so the tube is only marginally
+    # resolved. The certified brackets come from the refined two-dimensional study.
+    axi.set_title("one canal, at the element scale", fontsize=7.5, pad=2)
+
+    ax2.legend(handles=[Patch(facecolor=fc[1], label="tissue (0.3 S/m)"),
+                        Patch(facecolor=fc[0], label="seawater (4 S/m)"),
+                        Patch(facecolor=fc[2], label="gel canal (4 S/m)")],
+               fontsize=8.5, ncol=3, loc="upper center", bbox_to_anchor=(0.5, -0.01),
+               frameon=False)
+
+    fig.suptitle("Three-dimensional tetrahedral discretisation on a real great hammerhead head",
+                 fontsize=12, y=0.965)
+    fig.savefig(os.path.join(FIGDIR, "Fig_mesh3d.png"), dpi=130)
+    plt.close(fig)
     print("-> Fig_mesh3d.png (hammerhead)")
 
 
