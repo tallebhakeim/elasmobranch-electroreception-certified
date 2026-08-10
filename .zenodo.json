@@ -1,0 +1,24 @@
+{
+  "title": "Certified field model of elasmobranch electroreception: code and data",
+  "description": "<p>Code and data accompanying the article <em>An error-bounded field model of elasmobranch electroreception: canal funnelling, frequency tuning and the effect of body plan in a hammerhead shark and a manta ray</em> (H. Talleb).</p><p>The ampulla of Lorenzini is treated as an electroquasistatic conduction problem and solved with a dual discrete geometric method whose primal and complementary solves bracket the dissipated energy from both sides, so the reported quantities carry guaranteed two-sided bounds rather than error estimates. <code>reproduce_all.py</code> regenerates every figure and every number of the article from scratch in about two and a half minutes.</p><p>Contents: a frozen five-module subset of the field engine; the model and figure scripts; the thirty-five parameter sensitivity and robustness campaign; and the two photogrammetric surface models used for the two body plans.</p><p><strong>Licensing.</strong> The code is under the MIT licence. The two surface models under <code>meshes/</code> are the work of DigitalLife3D (digitallife3d.org) and are redistributed under their own Creative Commons Attribution-NonCommercial 4.0 licence. This archive as a whole is therefore recorded as CC BY-NC 4.0, which is the more restrictive of the two: it is the only statement that does not overreach on the surface models. The code alone remains MIT, as stated in the LICENSE file.</p>",
+  "license": "cc-by-nc-4.0",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "Talleb, Hakeim",
+      "affiliation": "Sorbonne Universite, Universite Paris-Saclay, CNRS, CentraleSupelec, Laboratoire de Genie Electrique et Electronique de Paris (GeePs), 91192 Gif-sur-Yvette, France",
+      "orcid": "0000-0002-2734-6242"
+    }
+  ],
+  "keywords": [
+    "electroreception",
+    "ampullae of Lorenzini",
+    "magnetoreception",
+    "hammerhead shark",
+    "manta ray",
+    "guaranteed error bounds",
+    "discrete geometric method",
+    "complementary variational bounds"
+  ],
+  "language": "eng"
+}
